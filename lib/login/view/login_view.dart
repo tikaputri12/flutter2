@@ -109,6 +109,13 @@ class _LoginViewState extends State<LoginView> {
                         child: Text("Login"),
                       ),
                     ),
+                    SizedBox(height: 8.0),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/register');
+                      },
+                     child: Text("Don't have an account? Register here")
+                     )
                   ],
                 ),
               ),
