@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter2/register/models/register_models.dart';
+import 'package:flutter2/register/models/register_model.dart';
 import 'package:http/http.dart' as http;
 
 class RegisterRepository {
