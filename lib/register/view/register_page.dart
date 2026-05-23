@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter2/register/view/register_view.dart';
 
-
 class RegisterPage extends StatelessWidget {
   const RegisterPage({super.key});
 
