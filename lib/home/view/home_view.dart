@@ -32,7 +32,7 @@ class HomeView extends StatelessWidget {
             BlocBuilder<LoginBloc, LoginState>(
                 builder: (context, state) {
                   if (state is LoginSuccess) {
-                    final user = state.login.user;
+                    final user = state.login.data!.user;
 
                     return Column(
                       children: [
