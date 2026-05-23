@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter2/register/bloc/register_event.dart';
 import 'package:flutter2/register/bloc/register_state.dart';
-import 'package:flutter2/register/models/register_models.dart';
+import 'package:flutter2/register/models/register_model.dart';
 import 'package:flutter2/register/repository/register_repository.dart';
 
 
