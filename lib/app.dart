@@ -23,55 +23,41 @@ class CounterApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-
         // LOGIN REPOSITORY
         RepositoryProvider(
-          create: (_) => LoginRepository(
-            httpClient: http.Client(),
-          ),
+          create: (_) => LoginRepository(httpClient: http.Client()),
         ),
 
         // REGISTER REPOSITORY
         RepositoryProvider(
-          create: (_) => RegisterRepository(
-            httpClient: http.Client(),
-          ),
+          create: (_) => RegisterRepository(httpClient: http.Client()),
         ),
       ],
 
       child: MultiBlocProvider(
         providers: [
-
           // COUNTER
-          BlocProvider(
-            create: (_) => CounterCubit(),
-          ),
+          BlocProvider(create: (_) => CounterCubit()),
 
           // POSTS
           BlocProvider(
-            create: (_) => PostBloc(
-              httpClient: http.Client(),
-            )..add(PostFetched()),
+            create: (_) =>
+                PostBloc(httpClient: http.Client())..add(PostFetched()),
           ),
 
           // THEME
-          BlocProvider(
-            create: (_) => ThemeCubit(),
-          ),
+          BlocProvider(create: (_) => ThemeCubit()),
 
           // LOGIN BLOC
           BlocProvider(
-            create: (context) => LoginBloc(
-              loginRepository:
-                  context.read<LoginRepository>(),
-            ),
+            create: (context) =>
+                LoginBloc(loginRepository: context.read<LoginRepository>()),
           ),
 
           // REGISTER BLOC
           BlocProvider(
             create: (context) => RegisterBloc(
-              registerRepository:
-                  context.read<RegisterRepository>(),
+              registerRepository: context.read<RegisterRepository>(),
             ),
           ),
         ],
@@ -84,8 +70,7 @@ class CounterApp extends StatelessWidget {
               theme: ThemeData.light(),
               darkTheme: ThemeData.dark(),
 
-              themeMode:
-                  context.watch<ThemeCubit>().state,
+              themeMode: context.watch<ThemeCubit>().state,
 
               initialRoute: '/login',
 
