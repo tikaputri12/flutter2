@@ -6,9 +6,7 @@ import 'package:http/http.dart' as http;
 class RegisterRepository {
   final http.Client httpClient;
 
-  RegisterRepository({
-    required this.httpClient,
-  });
+  RegisterRepository({required this.httpClient});
 
   // REGISTER
   Future<RegisterModel> register({
@@ -17,19 +15,11 @@ class RegisterRepository {
     required String password,
   }) async {
     final response = await httpClient.post(
-      Uri.parse(
-        'https://api.ppb.widiarrohman.my.id/api/auth/local/register',
-      ),
+      Uri.parse('https://api.ppb.widiarrohman.my.id/api/auth/local/register'),
 
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
 
-      body: {
-        'email': email,
-        'username': username,
-        'password': password,
-      },
+      body: {'email': email, 'username': username, 'password': password},
     );
 
     print(response.body);
