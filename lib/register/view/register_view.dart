@@ -4,7 +4,6 @@ import 'package:flutter2/register/bloc/register_event.dart';
 import 'package:flutter2/register/bloc/register_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
 
