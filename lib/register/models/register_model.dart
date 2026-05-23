@@ -6,11 +6,7 @@ class RegisterModel {
   final String message;
   final RegisterModelData? data;
 
-  RegisterModel({
-    required this.success,
-    required this.message,
-    this.data,
-  });
+  RegisterModel({required this.success, required this.message, this.data});
 
   RegisterModel copyWith({
     bool? success,
@@ -28,16 +24,14 @@ class RegisterModel {
     return RegisterModel(
       success: json['success'],
       message: json['message'],
-      data: json['data'] != null ? RegisterModelData.fromMap(Map<String, dynamic>.from(json['data'])) : null,
+      data: json['data'] != null
+          ? RegisterModelData.fromMap(Map<String, dynamic>.from(json['data']))
+          : null,
     );
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'success': success,
-      'message': message,
-      'data': data?.toMap(),
-    };
+    return {'success': success, 'message': message, 'data': data?.toMap()};
   }
 }
 
@@ -45,33 +39,25 @@ class RegisterModelData {
   final String jwt;
   final RegisterModelDataUser? user;
 
-  RegisterModelData({
-    required this.jwt,
-    this.user,
-  });
+  RegisterModelData({required this.jwt, this.user});
 
-  RegisterModelData copyWith({
-    String? jwt,
-    RegisterModelDataUser? user,
-  }) {
-    return RegisterModelData(
-      jwt: jwt ?? this.jwt,
-      user: user ?? this.user,
-    );
+  RegisterModelData copyWith({String? jwt, RegisterModelDataUser? user}) {
+    return RegisterModelData(jwt: jwt ?? this.jwt, user: user ?? this.user);
   }
 
   factory RegisterModelData.fromMap(Map<String, dynamic> json) {
     return RegisterModelData(
       jwt: json['jwt'],
-      user: json['user'] != null ? RegisterModelDataUser.fromMap(Map<String, dynamic>.from(json['user'])) : null,
+      user: json['user'] != null
+          ? RegisterModelDataUser.fromMap(
+              Map<String, dynamic>.from(json['user']),
+            )
+          : null,
     );
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'jwt': jwt,
-      'user': user?.toMap(),
-    };
+    return {'jwt': jwt, 'user': user?.toMap()};
   }
 }
 
@@ -130,9 +116,15 @@ class RegisterModelDataUser {
       provider: json['provider'],
       confirmed: json['confirmed'],
       blocked: json['blocked'],
-      createdat: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
-      updatedat: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
-      publishedat: json['publishedAt'] != null ? DateTime.parse(json['publishedAt']) : null,
+      createdat: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : null,
+      updatedat: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'])
+          : null,
+      publishedat: json['publishedAt'] != null
+          ? DateTime.parse(json['publishedAt'])
+          : null,
     );
   }
 
