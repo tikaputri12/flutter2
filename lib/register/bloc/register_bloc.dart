@@ -4,7 +4,6 @@ import 'package:flutter2/register/bloc/register_state.dart';
 import 'package:flutter2/register/models/register_model.dart';
 import 'package:flutter2/register/repository/register_repository.dart';
 
-
 class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
   final RegisterRepository registerRepository;
   RegisterBloc({required this.registerRepository}) : super(RegisterInitial()) {
