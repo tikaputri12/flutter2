@@ -12,25 +12,37 @@ class CounterView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocListener<CounterCubit, CounterState>(
       listener: (context, state) {
-        // TODO: implement listener
+        // snackbar ketika counter = 10
         if (state.counter == 10) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text("Counter mencapai 10")));
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Counter mencapai 10"),
+            ),
+          );
         }
-        // jika counter < 0, maka tampilkan alert dialog
-        if (state.counter < 0) {
+
+        // dialog ketika counter negatif
+        if (state.counter == -1) {
           showDialog(
             context: context,
             builder: (_) {
               return AlertDialog(
-                title: Text("Warning"),
-                content: Text("Counter Negatif!"),
+                title: const Text("Warning"),
+                content: const Text("Counter Negatif!"),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("OK"),
+                  ),
+                ],
               );
             },
           );
         }
       },
+
       child: Scaffold(
         appBar: AppBar(
           actions: [
@@ -42,9 +54,12 @@ class CounterView extends StatelessWidget {
             ),
           ],
         ),
+
         drawer: const AppDrawer(),
+
         body: Center(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               BlocBuilder<CounterCubit, CounterState>(
                 builder: (context, state) {
@@ -54,25 +69,38 @@ class CounterView extends StatelessWidget {
                   );
                 },
               ),
+
               BlocSelector<CounterCubit, CounterState, bool>(
                 selector: (state) => state.isEven,
                 builder: (context, isEven) {
-                  return Text(isEven ? "Genap" : "Ganjil");
+                  return Text(
+                    isEven ? "Genap" : "Ganjil",
+                  );
                 },
               ),
             ],
           ),
         ),
+
         floatingActionButton: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             FloatingActionButton(
-              onPressed: () => context.read<CounterCubit>().increment(),
+              heroTag: "btnTambah",
+              onPressed: () {
+                context.read<CounterCubit>().increment();
+              },
               child: const Icon(Icons.add),
             ),
+
             const SizedBox(height: 10),
+
             FloatingActionButton(
-              onPressed: () => context.read<CounterCubit>().decrement(),
+              heroTag: "btnKurang",
+              onPressed: () {
+                context.read<CounterCubit>().decrement();
+              },
               child: const Icon(Icons.remove),
             ),
           ],
