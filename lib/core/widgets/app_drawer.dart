@@ -124,6 +124,18 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushNamed(context, '/login');
             },
           ),
+          const Divider(),
+          ListTile(
+            title: Text("Profile"),
+            subtitle: const Text('Melihat halaman profile'),
+            leading: const Icon(Icons.account_circle_outlined, size: 40, color: Colors.blue),
+            trailing: const Icon(Icons.arrow_forward_ios),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/profile');
+            },
+          ),
+
         ],
       ),
     );
