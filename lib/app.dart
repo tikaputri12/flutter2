@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter2/auth/cubit/auth_cubit.dart';
 import 'package:flutter2/core/theme/theme_cubit.dart';
 import 'package:flutter2/counter/cubit/counter_cubit.dart';
 import 'package:flutter2/counter/view/counter_page.dart';
@@ -9,6 +10,9 @@ import 'package:flutter2/login/view/login_page.dart';
 import 'package:flutter2/posts/bloc/post_bloc.dart';
 import 'package:flutter2/posts/bloc/post_event.dart';
 import 'package:flutter2/posts/view/posts_page.dart';
+import 'package:flutter2/profile/bloc/profile_bloc.dart';
+import 'package:flutter2/profile/repository/profile_repository.dart';
+import 'package:flutter2/profile/view/profile_page.dart';
 import 'package:flutter2/register/bloc/register_bloc.dart';
 import 'package:flutter2/register/repository/register_repository.dart';
 import 'package:flutter2/register/view/register_page.dart';
@@ -32,6 +36,11 @@ class CounterApp extends StatelessWidget {
         RepositoryProvider(
           create: (_) => RegisterRepository(httpClient: http.Client()),
         ),
+
+        // PROFILE REPOSITORY
+        RepositoryProvider(
+          create: (_) => ProfileRepository(httpClient: http.Client()),
+        ),
       ],
 
       child: MultiBlocProvider(
@@ -48,16 +57,28 @@ class CounterApp extends StatelessWidget {
           // THEME
           BlocProvider(create: (_) => ThemeCubit()),
 
+          // AUTH CUBIT
+          BlocProvider(create: (_) => AuthCubit()),
+
           // LOGIN BLOC
           BlocProvider(
             create: (context) =>
-                LoginBloc(loginRepository: context.read<LoginRepository>()),
+                LoginBloc(
+                  loginRepository: context.read<LoginRepository>(),
+                ),
           ),
 
           // REGISTER BLOC
           BlocProvider(
             create: (context) => RegisterBloc(
               registerRepository: context.read<RegisterRepository>(),
+            ),
+          ),
+
+          // PROFILE BLOC
+          BlocProvider(
+            create: (context) => ProfileBloc(
+              profileRepository: context.read<ProfileRepository>(),
             ),
           ),
         ],
@@ -84,6 +105,8 @@ class CounterApp extends StatelessWidget {
                 '/login': (_) => const LoginPage(),
 
                 '/register': (_) => const RegisterPage(),
+
+                '/profile': (_) => const ProfilePage(),
               },
             );
           },
