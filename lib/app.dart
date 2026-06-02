@@ -12,6 +12,7 @@ import 'package:flutter2/posts/bloc/post_event.dart';
 import 'package:flutter2/posts/view/posts_page.dart';
 import 'package:flutter2/profile/bloc/profile_bloc.dart';
 import 'package:flutter2/profile/repository/profile_repository.dart';
+import 'package:flutter2/profile/view/profile_edit.dart';
 import 'package:flutter2/profile/view/profile_page.dart';
 import 'package:flutter2/register/bloc/register_bloc.dart';
 import 'package:flutter2/register/repository/register_repository.dart';
@@ -107,6 +108,8 @@ class CounterApp extends StatelessWidget {
                 '/register': (_) => const RegisterPage(),
 
                 '/profile': (_) => const ProfilePage(),
+
+                '/update-profile': (_) => const ProfileEdit(),
               },
             );
           },
