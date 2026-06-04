@@ -19,47 +19,74 @@ class _ProfileViewState extends State<ProfileView> {
 
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController usernameController =
+      TextEditingController();
 
-  final TextEditingController emailController = TextEditingController();
+  final TextEditingController emailController =
+      TextEditingController();
 
   @override
   void initState() {
     super.initState();
 
     // load profile
-    final token = context.read<AuthCubit>().state.token;
+    final token =
+        context.read<AuthCubit>().state.token;
 
-    context.read<ProfileBloc>().add(LoadProfile(token: token!));
+    context.read<ProfileBloc>().add(
+      LoadProfile(token: token!),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<ProfileBloc, ProfileState>(
       listener: (context, state) {
+
         // jika profile success
         if (state is ProfileSuccess) {
-          final profile = state.profile.data;
 
-          usernameController.text = profile!.username;
-          emailController.text = profile.email;
+          final profile =
+              state.profile.data;
 
-          confirmed = profile.confirmed;
-          blocked = profile.blocked;
+          usernameController.text =
+              profile!.username;
+
+          emailController.text =
+              profile.email;
+
+          confirmed =
+              profile.confirmed;
+
+          blocked =
+              profile.blocked;
         }
 
         // jika profile gagal
         if (state is ProfileFailure) {
+
           showDialog(
             context: context,
-            builder: (context) => AlertDialog(
-              title: const Text("Load Profile Failed"),
-              content: Text(state.message),
+
+            builder: (context) =>
+                AlertDialog(
+              title: const Text(
+                "Load Profile Failed",
+              ),
+
+              content:
+                  Text(state.message),
+
               actions: [
                 TextButton(
-                  child: const Text("OK"),
+                  child: const Text(
+                    "OK",
+                  ),
+
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.of(
+                      context,
+                    ).pop();
                   },
                 ),
               ],
@@ -69,17 +96,26 @@ class _ProfileViewState extends State<ProfileView> {
       },
 
       builder: (context, state) {
+
         return Scaffold(
-          appBar: AppBar(title: const Text("Profile Page")),
+          appBar: AppBar(
+            title: const Text(
+              "Profile Page",
+            ),
+          ),
 
           body: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
+            padding:
+                const EdgeInsets.all(20),
 
             child: Column(
               children: [
+
                 buildProfileBuilder(),
 
-                const SizedBox(height: 20),
+                const SizedBox(
+                  height: 20,
+                ),
 
                 // status card
                 buildStatusCard(),
@@ -89,9 +125,23 @@ class _ProfileViewState extends State<ProfileView> {
                 // form
                 buildForm(),
 
-                const SizedBox(height: 32),
+                const SizedBox(
+                  height: 32,
+                ),
 
-                buildLogoutButton(context),
+                // logout button
+                buildLogoutButton(
+                  context,
+                ),
+
+                const SizedBox(
+                  height: 20,
+                ),
+
+                // danger zone
+                buildDangerZone(
+                  context,
+                ),
               ],
             ),
           ),
@@ -100,24 +150,40 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  SizedBox buildLogoutButton(BuildContext context) {
+  SizedBox buildLogoutButton(
+    BuildContext context,
+  ) {
     return SizedBox(
       width: double.infinity,
       height: 50,
 
       child: OutlinedButton.icon(
         onPressed: () {
+
           Navigator.pop(context);
-          Navigator.pushNamed(context, '/login');
+
+          Navigator.pushNamed(
+            context,
+            '/login',
+          );
         },
 
-        label: const Text("Logout"),
+        label: const Text(
+          "Logout",
+        ),
 
-        icon: const Icon(Icons.logout),
+        icon: const Icon(
+          Icons.logout,
+        ),
 
-        style: OutlinedButton.styleFrom(
-          foregroundColor: Colors.teal,
-          side: const BorderSide(color: Colors.teal),
+        style:
+            OutlinedButton.styleFrom(
+          foregroundColor:
+              Colors.teal,
+
+          side: const BorderSide(
+            color: Colors.teal,
+          ),
         ),
       ),
     );
@@ -129,70 +195,116 @@ class _ProfileViewState extends State<ProfileView> {
 
       child: Column(
         children: [
+
           TextFormField(
-            controller: usernameController,
+            controller:
+                usernameController,
 
-            decoration: InputDecoration(
-              labelText: 'Username',
+            decoration:
+                InputDecoration(
+              labelText:
+                  'Username',
 
-              prefixIcon: const Icon(Icons.person),
+              prefixIcon:
+                  const Icon(
+                Icons.person,
+              ),
 
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
+              border:
+                  OutlineInputBorder(
+                borderRadius:
+                    BorderRadius.circular(
+                  14,
+                ),
               ),
             ),
 
             validator: (value) {
-              if (value == null || value.isEmpty) {
-                return "Username wajib diisi";
+
+              if (value == null ||
+                  value.isEmpty) {
+
+                return
+                    "Username wajib diisi";
               }
 
               return null;
             },
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(
+            height: 8,
+          ),
 
           TextFormField(
-            controller: emailController,
+            controller:
+                emailController,
 
-            decoration: InputDecoration(
-              labelText: 'Email',
+            decoration:
+                InputDecoration(
+              labelText:
+                  'Email',
 
-              prefixIcon: const Icon(Icons.email),
+              prefixIcon:
+                  const Icon(
+                Icons.email,
+              ),
 
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
+              border:
+                  OutlineInputBorder(
+                borderRadius:
+                    BorderRadius.circular(
+                  14,
+                ),
               ),
             ),
 
             validator: (value) {
-              if (value == null || value.isEmpty) {
-                return "Email wajib diisi";
+
+              if (value == null ||
+                  value.isEmpty) {
+
+                return
+                    "Email wajib diisi";
               }
 
               return null;
             },
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(
+            height: 8,
+          ),
 
           SizedBox(
             width: double.infinity,
             height: 50,
 
-            child: ElevatedButton.icon(
+            child:
+                ElevatedButton.icon(
               onPressed: () {
-                Navigator.pop(context);
 
-                Navigator.pushNamed(context, '/update-profile');
+                Navigator.pop(
+                  context,
+                );
 
-                print("update profile");
+                Navigator.pushNamed(
+                  context,
+                  '/update-profile',
+                );
+
+                print(
+                  "update profile",
+                );
               },
 
-              label: const Text("Update Profile"),
+              label: const Text(
+                "Update Profile",
+              ),
 
-              icon: const Icon(Icons.save),
+              icon: const Icon(
+                Icons.save,
+              ),
             ),
           ),
         ],
@@ -204,37 +316,60 @@ class _ProfileViewState extends State<ProfileView> {
     return Card(
       elevation: 2,
 
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape:
+          RoundedRectangleBorder(
+        borderRadius:
+            BorderRadius.circular(
+          12,
+        ),
+      ),
 
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding:
+            const EdgeInsets.all(16),
 
         child: Row(
           children: [
+
             // icon
             Icon(
-              isConfirmed ? Icons.verified : Icons.warning,
+              isConfirmed
+                  ? Icons.verified
+                  : Icons.warning,
 
-              color: isConfirmed ? Colors.green : Colors.red,
+              color: isConfirmed
+                  ? Colors.green
+                  : Colors.red,
             ),
 
-            const SizedBox(width: 10),
+            const SizedBox(
+              width: 10,
+            ),
 
             // text
             Expanded(
               child: Text(
-                isConfirmed ? "Account Verified" : "Account not verified",
+                isConfirmed
+                    ? "Account Verified"
+                    : "Account not verified",
 
                 style: TextStyle(
-                  color: isConfirmed ? Colors.green : Colors.red,
+                  color: isConfirmed
+                      ? Colors.green
+                      : Colors.red,
                 ),
               ),
             ),
 
             if (isBlocked)
               const Chip(
-                label: Text("Blocked"),
-                backgroundColor: Colors.deepOrangeAccent,
+                label: Text(
+                  "Blocked",
+                ),
+
+                backgroundColor:
+                    Colors
+                        .deepOrangeAccent,
               ),
           ],
         ),
@@ -245,20 +380,146 @@ class _ProfileViewState extends State<ProfileView> {
   Column buildProfileBuilder() {
     return Column(
       children: [
-        const CircleAvatar(radius: 50, child: Icon(Icons.person, size: 50)),
 
-        const SizedBox(height: 12),
+        const CircleAvatar(
+          radius: 50,
+
+          child: Icon(
+            Icons.person,
+            size: 50,
+          ),
+        ),
+
+        const SizedBox(
+          height: 12,
+        ),
 
         Text(
           usernameController.text,
 
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight:
+                FontWeight.bold,
+          ),
         ),
 
-        const SizedBox(height: 4),
+        const SizedBox(
+          height: 4,
+        ),
 
-        Text(emailController.text, style: TextStyle(color: Colors.grey[500])),
+        Text(
+          emailController.text,
+
+          style: TextStyle(
+            color: Colors.grey[500],
+          ),
+        ),
       ],
+    );
+  }
+
+  Container buildDangerZone(
+    BuildContext context,
+  ) {
+    return Container(
+      width: double.infinity,
+
+      padding:
+          const EdgeInsets.all(16),
+
+      decoration: BoxDecoration(
+        border: Border.all(
+          color:
+              Colors.red.shade200,
+        ),
+
+        borderRadius:
+            BorderRadius.circular(
+          12,
+        ),
+
+        color:
+            Colors.red.shade50,
+      ),
+
+      child: Column(
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
+
+        children: [
+
+          Text(
+            "Danger Zone",
+
+            style: TextStyle(
+              color:
+                  Colors.red.shade700,
+
+              fontSize: 16,
+
+              fontWeight:
+                  FontWeight.bold,
+            ),
+          ),
+
+          const SizedBox(
+            height: 8,
+          ),
+
+          Text(
+            "These actions may affect your account permanently.",
+
+            style: TextStyle(
+              color:
+                  Colors.grey.shade700,
+            ),
+          ),
+
+          const SizedBox(
+            height: 16,
+          ),
+
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+
+            child:
+                OutlinedButton.icon(
+              style:
+                  OutlinedButton.styleFrom(
+                foregroundColor:
+                    Colors.red,
+
+                side:
+                    const BorderSide(
+                  color: Colors.red,
+                ),
+              ),
+
+              icon: const Icon(
+                Icons.delete_forever,
+              ),
+
+              label: const Text(
+                "Delete Account",
+              ),
+
+              onPressed: () {
+
+                Navigator.pushNamed(
+                  context,
+                  '/delete-account',
+                );
+
+                print(
+                  "Delete account pressed",
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
