@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
+import 'package:flutter2/core/theme/theme_cubit.dart';
 import 'package:flutter2/core/widgets/app_drawer.dart';
 import 'package:flutter2/posts/bloc/post_bloc.dart';
 import 'package:flutter2/posts/bloc/post_event.dart';
@@ -33,7 +34,18 @@ class _PostsListState extends State<PostsList> {
           case PostStatus.failure:
             print('failed to fetch data posts');
             return Scaffold(
-              appBar: AppBar(title: Text("Post List")),
+              appBar: AppBar(
+                title: Text("Post List"),
+                  actions: [
+                    IconButton(
+                      onPressed: () {
+                        context.read<ThemeCubit>().toggleTheme();
+                      },
+                      icon: Icon(Icons.dark_mode),
+                    ),
+                  ],
+                ),
+              
               drawer: AppDrawer(),
               body: Center(child: Text('Failed to fetch data posts')),
             );
@@ -41,13 +53,34 @@ class _PostsListState extends State<PostsList> {
             if (state.posts.isEmpty) {
               print('no posts');
               return Scaffold(
-                appBar: AppBar(title: Text("Post List")),
+                appBar: AppBar(
+                  title: Text("Post List"),
+                    actions: [
+                      IconButton(
+                        onPressed: () {
+                          context.read<ThemeCubit>().toggleTheme();
+                        },
+                        icon: Icon(Icons.dark_mode),
+                      ),
+                    ],
+                  ),
+
                 drawer: AppDrawer(),
                 body: Center(child: Text('no posts')),
               );
             }
             return Scaffold(
-              appBar: AppBar(title: Text("Post List")),
+              appBar: AppBar(
+                title: Text("Post List"),
+                  actions: [
+                    IconButton(
+                      onPressed: () {
+                        context.read<ThemeCubit>().toggleTheme();
+                      },
+                      icon: Icon(Icons.dark_mode),
+                    ),
+                  ],
+                ),
               drawer: AppDrawer(),
               body: ListView.builder(
                 itemBuilder: (BuildContext context, int index) {
