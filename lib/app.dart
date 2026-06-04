@@ -3,6 +3,9 @@ import 'package:flutter2/auth/cubit/auth_cubit.dart';
 import 'package:flutter2/core/theme/theme_cubit.dart';
 import 'package:flutter2/counter/cubit/counter_cubit.dart';
 import 'package:flutter2/counter/view/counter_page.dart';
+import 'package:flutter2/delete_account/bloc/delete_account_bloc.dart';
+import 'package:flutter2/delete_account/repository/delete_account_repository.dart';
+import 'package:flutter2/delete_account/view/delete_account_view.dart';
 import 'package:flutter2/home/view/home_page.dart';
 import 'package:flutter2/login/bloc/login_bloc.dart';
 import 'package:flutter2/login/repository/login_repository.dart';
@@ -28,88 +31,76 @@ class CounterApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        // LOGIN REPOSITORY
         RepositoryProvider(
           create: (_) => LoginRepository(httpClient: http.Client()),
         ),
-
-        // REGISTER REPOSITORY
         RepositoryProvider(
           create: (_) => RegisterRepository(httpClient: http.Client()),
         ),
-
-        // PROFILE REPOSITORY
         RepositoryProvider(
           create: (_) => ProfileRepository(httpClient: http.Client()),
         ),
+        RepositoryProvider(
+          create: (_) => DeleteAccountRepository(httpClient: http.Client()),
+        ),
       ],
-
       child: MultiBlocProvider(
         providers: [
-          // COUNTER
           BlocProvider(create: (_) => CounterCubit()),
 
-          // POSTS
           BlocProvider(
             create: (_) =>
                 PostBloc(httpClient: http.Client())..add(PostFetched()),
           ),
 
-          // THEME
           BlocProvider(create: (_) => ThemeCubit()),
 
-          // AUTH CUBIT
           BlocProvider(create: (_) => AuthCubit()),
 
-          // LOGIN BLOC
           BlocProvider(
-            create: (context) =>
-                LoginBloc(
-                  loginRepository: context.read<LoginRepository>(),
-                ),
+            create: (context) => LoginBloc(
+              loginRepository: context.read<LoginRepository>(),
+            ),
           ),
 
-          // REGISTER BLOC
           BlocProvider(
             create: (context) => RegisterBloc(
               registerRepository: context.read<RegisterRepository>(),
             ),
           ),
 
-          // PROFILE BLOC
           BlocProvider(
             create: (context) => ProfileBloc(
               profileRepository: context.read<ProfileRepository>(),
             ),
           ),
-        ],
 
+          
+          BlocProvider(
+            create: (context) => DeleteAccountBloc(
+              deleteAccountRepository:
+                  context.read<DeleteAccountRepository>(),
+            ),
+          ),
+        ],
+        
         child: BlocBuilder<ThemeCubit, ThemeMode>(
           builder: (context, state) {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
-
               theme: ThemeData.light(),
               darkTheme: ThemeData.dark(),
-
               themeMode: context.watch<ThemeCubit>().state,
-
               initialRoute: '/login',
-
               routes: {
                 '/home': (_) => const HomePage(),
-
                 '/counter': (_) => const CounterPage(),
-
                 '/posts': (_) => const PostsPage(),
-
                 '/login': (_) => const LoginPage(),
-
                 '/register': (_) => const RegisterPage(),
-
                 '/profile': (_) => const ProfilePage(),
-
                 '/update-profile': (_) => const ProfileEdit(),
+                '/delete-account': (_) => const DeleteAccountView(),
               },
             );
           },
