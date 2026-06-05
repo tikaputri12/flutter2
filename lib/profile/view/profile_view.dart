@@ -179,10 +179,10 @@ class _ProfileViewState extends State<ProfileView> {
         style:
             OutlinedButton.styleFrom(
           foregroundColor:
-              Colors.teal,
+              const Color.fromARGB(155, 186, 37, 27),
 
           side: const BorderSide(
-            color: Colors.teal,
+            color: Color.fromARGB(184, 150, 0, 0),
           ),
         ),
       ),
