@@ -152,7 +152,7 @@ class AppDrawer extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   const Text(
-                    "Flutter Bloc App",
+                    " Bloc Cubit App",
 
                     style: TextStyle(
                       color: Colors.white,
@@ -239,7 +239,7 @@ class AppDrawer extends StatelessWidget {
             context: context,
             icon: Icons.calculate_rounded,
             title: "Counter",
-            subtitle: "Counter Cubit Feature",
+            subtitle: "Counter Cubit Feature ",
             route: '/counter',
             color: Colors.orange,
           ),
@@ -259,7 +259,7 @@ class AppDrawer extends StatelessWidget {
             context: context,
             icon: Icons.category_rounded,
             title: "Category",
-            subtitle: "CRUD Category Feature",
+            subtitle: "CRUD Category Feature ",
             route: '/categories',
             color: Colors.purple,
           ),
