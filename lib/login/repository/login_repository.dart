@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter2/login/models/login_model.dart';
-import 'package:flutter2/login/models/user_model.dart';
 import 'package:http/http.dart' as http;
 
 class LoginRepository {
