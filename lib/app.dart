@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter2/auth/cubit/auth_cubit.dart';
+import 'package:flutter2/categories/bloc/category_bloc.dart';
+import 'package:flutter2/categories/repository/category_repository.dart';
+import 'package:flutter2/categories/view/category_view.dart';
 import 'package:flutter2/core/theme/theme_cubit.dart';
 import 'package:flutter2/counter/cubit/counter_cubit.dart';
 import 'package:flutter2/counter/view/counter_page.dart';
@@ -21,7 +24,6 @@ import 'package:flutter2/register/bloc/register_bloc.dart';
 import 'package:flutter2/register/repository/register_repository.dart';
 import 'package:flutter2/register/view/register_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:http/http.dart' as http;
 
 class CounterApp extends StatelessWidget {
@@ -29,19 +31,24 @@ class CounterApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final client = http.Client(); // ✅ FIX: reuse http client
+
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(
-          create: (_) => LoginRepository(httpClient: http.Client()),
+          create: (_) => LoginRepository(httpClient: client),
         ),
         RepositoryProvider(
-          create: (_) => RegisterRepository(httpClient: http.Client()),
+          create: (_) => RegisterRepository(httpClient: client),
         ),
         RepositoryProvider(
-          create: (_) => ProfileRepository(httpClient: http.Client()),
+          create: (_) => ProfileRepository(httpClient: client),
         ),
         RepositoryProvider(
-          create: (_) => DeleteAccountRepository(httpClient: http.Client()),
+          create: (_) => DeleteAccountRepository(httpClient: client),
+        ),
+        RepositoryProvider(
+          create: (_) => CategoryRepository(httpClient: client),
         ),
       ],
       child: MultiBlocProvider(
@@ -49,8 +56,7 @@ class CounterApp extends StatelessWidget {
           BlocProvider(create: (_) => CounterCubit()),
 
           BlocProvider(
-            create: (_) =>
-                PostBloc(httpClient: http.Client())..add(PostFetched()),
+            create: (_) => PostBloc(httpClient: client)..add(PostFetched()),
           ),
 
           BlocProvider(create: (_) => ThemeCubit()),
@@ -75,23 +81,35 @@ class CounterApp extends StatelessWidget {
             ),
           ),
 
-          
           BlocProvider(
             create: (context) => DeleteAccountBloc(
               deleteAccountRepository:
                   context.read<DeleteAccountRepository>(),
             ),
           ),
+
+          BlocProvider(
+            create: (context) {
+              final token = context.read<AuthCubit>().state.token ?? '';
+              return CategoryBloc(
+                context.read<CategoryRepository>()
+              )..add(GetCategoryEvent(token: token));
+            }
+          )
         ],
-        
         child: BlocBuilder<ThemeCubit, ThemeMode>(
           builder: (context, state) {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
+
               theme: ThemeData.light(),
               darkTheme: ThemeData.dark(),
-              themeMode: context.watch<ThemeCubit>().state,
+
+              // ✅ FIX UTAMA (ini yang tadi salah)
+              themeMode: state,
+
               initialRoute: '/login',
+
               routes: {
                 '/home': (_) => const HomePage(),
                 '/counter': (_) => const CounterPage(),
@@ -101,6 +119,7 @@ class CounterApp extends StatelessWidget {
                 '/profile': (_) => const ProfilePage(),
                 '/update-profile': (_) => const ProfileEdit(),
                 '/delete-account': (_) => const DeleteAccountView(),
+                '/categories': (_) => const CategoryView(),
               },
             );
           },
