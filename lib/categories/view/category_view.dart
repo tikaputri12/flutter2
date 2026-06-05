@@ -30,69 +30,201 @@ class _CategoryViewState extends State<CategoryView> {
 
     if (token != null) {
       context.read<CategoryBloc>().add(
-        GetCategoryEvent(token: token),
-      );
+            GetCategoryEvent(token: token),
+          );
     }
+  }
+
+  Color _cardColor(int index) {
+    final colors = [
+      const Color(0xFF6C63FF),
+      const Color(0xFF43C6AC),
+      const Color(0xFFFFB347),
+      const Color(0xFF56CCF2),
+      const Color(0xFFBB6BD9),
+    ];
+
+    return colors[index % colors.length];
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Category CRUD")),
+      backgroundColor: const Color(0xFFF5F7FA),
 
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showForm(context);
-        },
-        child: const Icon(Icons.add),
+      // ================= APPBAR =================
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Color(0xFF2D2D2D),
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: const Text(
+          "Category",
+          style: TextStyle(
+            color: Color(0xFF2D2D2D),
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
       ),
 
+      // ================= FLOAT BUTTON =================
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFF6C63FF),
+        elevation: 3,
+        onPressed: () => _showForm(context),
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
+
+      // ================= BODY =================
       body: BlocBuilder<CategoryBloc, CategoryState>(
         builder: (context, state) {
 
           if (state is CategoryLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFF6C63FF),
+              ),
+            );
           }
 
           if (state is CategoryError) {
-            return Center(child: Text(state.message));
+            return Center(
+              child: Text(
+                state.message,
+                style: const TextStyle(color: Colors.red),
+              ),
+            );
           }
 
           if (state is CategoryLoaded) {
+
+            if (state.categories.isEmpty) {
+              return const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.folder_open_rounded,
+                      size: 70,
+                      color: Colors.grey,
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      "Belum ada kategori",
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
             return ListView.builder(
+              padding: const EdgeInsets.all(16),
               itemCount: state.categories.length,
               itemBuilder: (context, index) {
+
                 final item = state.categories[index];
+                final color = _cardColor(index);
 
-                return ListTile(
-                  title: Text(item.name),
-                  subtitle: Text(item.description),
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 14),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
 
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
+                  child: Row(
                     children: [
 
-                      IconButton(
-                        icon: const Icon(Icons.edit),
-                        onPressed: () {
-                          _showForm(context, category: item);
-                        },
+                      // ICON
+                      Container(
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          color: color.withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Icon(
+                          Icons.category_rounded,
+                          color: color,
+                          size: 26,
+                        ),
                       ),
 
-                      IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () async {
-                          final token = await getToken();
+                      const SizedBox(width: 14),
 
-                          if (token != null) {
-                            context.read<CategoryBloc>().add(
-                              DeleteCategoryEvent(
-                                id: item.id,
-                                token: token,
+                      // TEXT
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                          children: [
+
+                            Text(
+                              item.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Color(0xFF2D2D2D),
                               ),
-                            );
-                          }
-                        },
+                            ),
+
+                            const SizedBox(height: 4),
+
+                            Text(
+                              item.description,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey,
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // ACTION BUTTON
+                      Row(
+                        children: [
+
+                          IconButton(
+                            onPressed: () =>
+                                _showForm(context, category: item),
+                            icon: Icon(
+                              Icons.edit_rounded,
+                              color: color,
+                            ),
+                          ),
+
+                          IconButton(
+                            onPressed: () =>
+                                _confirmDelete(context, item),
+                            icon: const Icon(
+                              Icons.delete_outline_rounded,
+                              color: Colors.redAccent,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -101,78 +233,224 @@ class _CategoryViewState extends State<CategoryView> {
             );
           }
 
-          return const Center(child: Text("No Data"));
+          return const Center(
+            child: Text("No Data"),
+          );
         },
       ),
     );
   }
 
+  // ================= DELETE =================
+  void _confirmDelete(BuildContext context, CategoryModel item) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+        ),
+        title: const Text(
+          "Hapus Kategori",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'Yakin ingin menghapus "${item.name}"?',
+        ),
+        actions: [
+
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Batal"),
+          ),
+
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+            ),
+            onPressed: () async {
+
+              Navigator.pop(context);
+
+              final token = await getToken();
+
+              if (token != null && context.mounted) {
+                context.read<CategoryBloc>().add(
+                      DeleteCategoryEvent(
+                        id: item.id,
+                        token: token,
+                      ),
+                    );
+              }
+            },
+            child: const Text(
+              "Hapus",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================= FORM =================
   void _showForm(BuildContext context, {CategoryModel? category}) {
+
     final nameController =
         TextEditingController(text: category?.name ?? "");
+
     final descController =
         TextEditingController(text: category?.description ?? "");
 
     showDialog(
       context: context,
       builder: (_) {
-        return AlertDialog(
-          title: Text(category == null ? "Create" : "Edit"),
 
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: "Name"),
-              ),
-              TextField(
-                controller: descController,
-                decoration: const InputDecoration(labelText: "Description"),
-              ),
-            ],
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
           ),
 
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
-            ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
 
-            ElevatedButton(
-              onPressed: () async {
-                final token = await getToken();
-                if (token == null) return;
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
 
-                final model = CategoryModel(
-                  id: category?.id ?? 0,
-                  name: nameController.text,
-                  description: descController.text,
-                );
+                Text(
+                  category == null
+                      ? "Tambah Kategori"
+                      : "Edit Kategori",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
 
-                if (category == null) {
-                  context.read<CategoryBloc>().add(
-                    CreateCategoryEvent(
-                      category: model,
-                      token: token,
+                const SizedBox(height: 20),
+
+                TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    hintText: "Nama kategori",
+                    prefixIcon: const Icon(
+                      Icons.label_outline_rounded,
+                      color: Color(0xFF6C63FF),
                     ),
-                  );
-                } else {
-                  context.read<CategoryBloc>().add(
-                    UpdateCategoryEvent(
-                      id: category.id,
-                      category: model,
-                      token: token,
+                    filled: true,
+                    fillColor: const Color(0xFFF5F7FA),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
                     ),
-                  );
-                }
+                  ),
+                ),
 
-                Navigator.pop(context);
-                loadCategory();
-              },
-              child: const Text("Save"),
+                const SizedBox(height: 14),
+
+                TextField(
+                  controller: descController,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    hintText: "Deskripsi",
+                    prefixIcon: const Padding(
+                      padding: EdgeInsets.only(bottom: 45),
+                      child: Icon(
+                        Icons.description_outlined,
+                        color: Color(0xFF6C63FF),
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: const Color(0xFFF5F7FA),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                Row(
+                  children: [
+
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: const Text("Batal"),
+                      ),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF6C63FF),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+
+                        onPressed: () async {
+
+                          final token = await getToken();
+
+                          if (token == null) return;
+
+                          final model = CategoryModel(
+                            id: category?.id ?? 0,
+                            name: nameController.text,
+                            description: descController.text,
+                          );
+
+                          if (context.mounted) {
+
+                            if (category == null) {
+
+                              context.read<CategoryBloc>().add(
+                                    CreateCategoryEvent(
+                                      category: model,
+                                      token: token,
+                                    ),
+                                  );
+
+                            } else {
+
+                              context.read<CategoryBloc>().add(
+                                    UpdateCategoryEvent(
+                                      id: category.id,
+                                      category: model,
+                                      token: token,
+                                    ),
+                                  );
+                            }
+
+                            Navigator.pop(context);
+                          }
+                        },
+
+                        child: const Text(
+                          "Simpan",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
