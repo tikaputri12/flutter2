@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter2/login/bloc/login_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-// tambahkan import AuthCubit
 import 'package:flutter2/auth/cubit/auth_cubit.dart';
 
 class LoginView extends StatefulWidget {
@@ -23,39 +21,52 @@ class _LoginViewState extends State<LoginView> {
     super.dispose();
   }
 
+  void _submitLogin(BuildContext context) {
+    final identifier = _username.text.trim();
+    final password = _password.text.trim();
+
+    if (identifier.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Username dan password tidak boleh kosong")),
+      );
+      return;
+    }
+
+    context.read<LoginBloc>().add(
+      LoginSubmitted(
+        identifier: identifier,
+        password: password,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<LoginBloc, LoginState>(
       listener: (context, state) {
-        // jika state login success
         if (state is LoginSuccess) {
-
-          // simpan token global
           context.read<AuthCubit>().setLogin(
             token: state.login.data!.jwt,
           );
 
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(
-            SnackBar(content: Text("Login succesful")),
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Login succesful")),
           );
 
-          Future.delayed(Duration(seconds: 1), () {
+          Future.delayed(const Duration(seconds: 1), () {
             Navigator.pushReplacementNamed(context, '/home');
           });
         }
 
-        // jika state login failure
         if (state is LoginFailure) {
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: Text("Login Failed"),
-              content: Text("Username atau password salah"),
+              title: const Text("Login Failed"),
+              content: const Text("Username atau password salah"),
               actions: [
                 TextButton(
-                  child: Text("OK"),
+                  child: const Text("OK"),
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
@@ -66,9 +77,8 @@ class _LoginViewState extends State<LoginView> {
         }
       },
       builder: (context, state) {
-        // jika state sedang loading maka tampilkan Circular Progress Indicator
         if (state is LoginLoading) {
-          return Scaffold(
+          return const Scaffold(
             body: Center(
               child: CircularProgressIndicator(),
             ),
@@ -88,10 +98,11 @@ class _LoginViewState extends State<LoginView> {
                       "Login",
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
-                    SizedBox(height: 32.0),
+                    const SizedBox(height: 32.0),
 
                     TextField(
                       controller: _username,
+                      textInputAction: TextInputAction.next,
                       decoration: const InputDecoration(
                         labelText: "Username",
                         hintText: "Input username",
@@ -99,11 +110,13 @@ class _LoginViewState extends State<LoginView> {
                       ),
                     ),
 
-                    SizedBox(height: 8.0),
+                    const SizedBox(height: 8.0),
 
                     TextField(
                       controller: _password,
                       obscureText: true,
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => _submitLogin(context),
                       decoration: const InputDecoration(
                         labelText: "Password",
                         hintText: "Input Password",
@@ -111,33 +124,24 @@ class _LoginViewState extends State<LoginView> {
                       ),
                     ),
 
-                    SizedBox(height: 8.0),
+                    const SizedBox(height: 8.0),
 
                     SizedBox(
                       height: 50,
                       width: 200,
                       child: ElevatedButton(
-                        onPressed: () {
-                          print("login pressed");
-
-                          context.read<LoginBloc>().add(
-                            LoginSubmitted(
-                              identifier: _username.text,
-                              password: _password.text,
-                            ),
-                          );
-                        },
-                        child: Text("Login"),
+                        onPressed: () => _submitLogin(context),
+                        child: const Text("Login"),
                       ),
                     ),
 
-                    SizedBox(height: 8.0),
+                    const SizedBox(height: 8.0),
 
                     TextButton(
                       onPressed: () {
                         Navigator.pushNamed(context, '/register');
                       },
-                      child: Text(
+                      child: const Text(
                         "Don't have an account? Register here",
                       ),
                     ),
