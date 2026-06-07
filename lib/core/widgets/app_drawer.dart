@@ -71,6 +71,7 @@ class AppDrawer extends StatelessWidget {
           ),
 
           onTap: () {
+
             Navigator.pop(context);
 
             Navigator.pushNamed(
@@ -85,6 +86,7 @@ class AppDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Drawer(
       backgroundColor: Colors.grey.shade100,
 
@@ -239,7 +241,7 @@ class AppDrawer extends StatelessWidget {
             context: context,
             icon: Icons.calculate_rounded,
             title: "Counter",
-            subtitle: "Counter Cubit Feature ",
+            subtitle: "Counter Cubit Feature",
             route: '/counter',
             color: Colors.orange,
           ),
@@ -259,9 +261,19 @@ class AppDrawer extends StatelessWidget {
             context: context,
             icon: Icons.category_rounded,
             title: "Category",
-            subtitle: "CRUD Category Feature ",
+            subtitle: "CRUD Category Feature",
             route: '/categories',
             color: Colors.purple,
+          ),
+
+          // PRODUCTS
+          buildMenuItem(
+            context: context,
+            icon: Icons.shopping_bag_rounded,
+            title: "Products",
+            subtitle: "Menampilkan daftar products",
+            route: '/products',
+            color: Colors.deepOrange,
           ),
 
           // PROFILE
@@ -297,6 +309,7 @@ class AppDrawer extends StatelessWidget {
               ),
 
               onPressed: () {
+
                 Navigator.pop(context);
 
                 Navigator.pushNamed(
@@ -309,6 +322,7 @@ class AppDrawer extends StatelessWidget {
 
               label: const Text(
                 "Logout",
+
                 style: TextStyle(
                   fontSize: 16,
                 ),
