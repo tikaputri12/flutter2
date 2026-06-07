@@ -16,6 +16,9 @@ import 'package:flutter2/login/view/login_page.dart';
 import 'package:flutter2/posts/bloc/post_bloc.dart';
 import 'package:flutter2/posts/bloc/post_event.dart';
 import 'package:flutter2/posts/view/posts_page.dart';
+import 'package:flutter2/products/bloc/product_bloc.dart';
+import 'package:flutter2/products/repository/product_repository.dart';
+import 'package:flutter2/products/view/product_view.dart';
 import 'package:flutter2/profile/bloc/profile_bloc.dart';
 import 'package:flutter2/profile/repository/profile_repository.dart';
 import 'package:flutter2/profile/view/profile_edit.dart';
@@ -31,53 +34,88 @@ class CounterApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final client = http.Client(); // ✅ FIX: reuse http client
+
+    final client = http.Client();
 
     return MultiRepositoryProvider(
       providers: [
+
         RepositoryProvider(
-          create: (_) => LoginRepository(httpClient: client),
+          create: (_) => LoginRepository(
+            httpClient: client,
+          ),
         ),
+
         RepositoryProvider(
-          create: (_) => RegisterRepository(httpClient: client),
+          create: (_) => RegisterRepository(
+            httpClient: client,
+          ),
         ),
+
         RepositoryProvider(
-          create: (_) => ProfileRepository(httpClient: client),
+          create: (_) => ProfileRepository(
+            httpClient: client,
+          ),
         ),
+
         RepositoryProvider(
-          create: (_) => DeleteAccountRepository(httpClient: client),
+          create: (_) => DeleteAccountRepository(
+            httpClient: client,
+          ),
         ),
+
         RepositoryProvider(
-          create: (_) => CategoryRepository(httpClient: client),
+          create: (_) => CategoryRepository(
+            httpClient: client,
+          ),
+        ),
+
+        RepositoryProvider(
+          create: (_) => ProductRepository(
+            httpClient: client,
+          ),
         ),
       ],
+
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(create: (_) => CounterCubit()),
 
           BlocProvider(
-            create: (_) => PostBloc(httpClient: client)..add(PostFetched()),
+            create: (_) => CounterCubit(),
           ),
 
-          BlocProvider(create: (_) => ThemeCubit()),
+          BlocProvider(
+            create: (_) =>
+                PostBloc(httpClient: client)
+                  ..add(PostFetched()),
+          ),
 
-          BlocProvider(create: (_) => AuthCubit()),
+          BlocProvider(
+            create: (_) => ThemeCubit(),
+          ),
+
+          BlocProvider(
+            create: (_) => AuthCubit(),
+          ),
 
           BlocProvider(
             create: (context) => LoginBloc(
-              loginRepository: context.read<LoginRepository>(),
+              loginRepository:
+                  context.read<LoginRepository>(),
             ),
           ),
 
           BlocProvider(
             create: (context) => RegisterBloc(
-              registerRepository: context.read<RegisterRepository>(),
+              registerRepository:
+                  context.read<RegisterRepository>(),
             ),
           ),
 
           BlocProvider(
             create: (context) => ProfileBloc(
-              profileRepository: context.read<ProfileRepository>(),
+              profileRepository:
+                  context.read<ProfileRepository>(),
             ),
           ),
 
@@ -90,36 +128,70 @@ class CounterApp extends StatelessWidget {
 
           BlocProvider(
             create: (context) {
-              final token = context.read<AuthCubit>().state.token ?? '';
+
+              final token =
+                  context.read<AuthCubit>().state.token ?? '';
+
               return CategoryBloc(
-                context.read<CategoryRepository>()
-              )..add(GetCategoryEvent(token: token));
-            }
-          )
+                context.read<CategoryRepository>(),
+              )..add(
+                  GetCategoryEvent(
+                    token: token,
+                  ),
+                );
+            },
+          ),
+
+          BlocProvider(
+            create: (context) => ProductBloc(
+              context.read<ProductRepository>(),
+            ),
+          ),
         ],
+
         child: BlocBuilder<ThemeCubit, ThemeMode>(
           builder: (context, state) {
+
             return MaterialApp(
               debugShowCheckedModeBanner: false,
 
               theme: ThemeData.light(),
               darkTheme: ThemeData.dark(),
-
-              // ✅ FIX UTAMA (ini yang tadi salah)
               themeMode: state,
 
               initialRoute: '/login',
 
               routes: {
-                '/home': (_) => const HomePage(),
-                '/counter': (_) => const CounterPage(),
-                '/posts': (_) => const PostsPage(),
-                '/login': (_) => const LoginPage(),
-                '/register': (_) => const RegisterPage(),
-                '/profile': (_) => const ProfilePage(),
-                '/update-profile': (_) => const ProfileEdit(),
-                '/delete-account': (_) => const DeleteAccountView(),
-                '/categories': (_) => const CategoryView(),
+
+                '/home': (_) =>
+                    const HomePage(),
+
+                '/counter': (_) =>
+                    const CounterPage(),
+
+                '/posts': (_) =>
+                    const PostsPage(),
+
+                '/login': (_) =>
+                    const LoginPage(),
+
+                '/register': (_) =>
+                    const RegisterPage(),
+
+                '/profile': (_) =>
+                    const ProfilePage(),
+
+                '/update-profile': (_) =>
+                    const ProfileEdit(),
+
+                '/delete-account': (_) =>
+                    const DeleteAccountView(),
+
+                '/categories': (_) =>
+                    const CategoryView(),
+
+                '/products': (_) =>
+                    const ProductView(),
               },
             );
           },
