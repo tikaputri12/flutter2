@@ -71,17 +71,22 @@ class ProductRepository {
           "description": description,
           "available": available,
           "stock": stock,
-          "expired": expired,
+
+          // hanya kirim kalau tidak null
+          if (expired != null) "expired": expired,
         }
       }),
     );
 
+    print("CREATE PRODUCT");
     print(response.statusCode);
     print(response.body);
 
+    // API create biasanya 200 atau 201
     if (response.statusCode != 200 &&
         response.statusCode != 201) {
-      throw Exception("Gagal menambah product");
+
+      throw Exception(response.body);
     }
   }
 
@@ -113,16 +118,19 @@ class ProductRepository {
           "description": description,
           "available": available,
           "stock": stock,
-          "expired": expired,
+
+          // hanya kirim kalau tidak null
+          if (expired != null) "expired": expired,
         }
       }),
     );
 
+    print("UPDATE PRODUCT");
     print(response.statusCode);
     print(response.body);
 
     if (response.statusCode != 200) {
-      throw Exception("Gagal update product");
+      throw Exception(response.body);
     }
   }
 
@@ -142,12 +150,14 @@ class ProductRepository {
       },
     );
 
+    print("DELETE PRODUCT");
     print(response.statusCode);
     print(response.body);
 
     if (response.statusCode != 200 &&
         response.statusCode != 204) {
-      throw Exception("Gagal delete product");
+
+      throw Exception(response.body);
     }
   }
 }
