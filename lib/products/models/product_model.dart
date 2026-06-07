@@ -3,14 +3,17 @@
 
 class ProductModel {
   final int id;
-  final String idCategory;
-  final String categoryName;
-  final String documentid;
+
+  final int idCategory;
+  final String? categoryName;
+  final String? documentid;
+
   final String name;
   final String description;
   final bool available;
   final int stock;
   final dynamic expired;
+
   final DateTime? createdat;
   final DateTime? updatedat;
   final DateTime? publishedat;
@@ -18,8 +21,8 @@ class ProductModel {
   ProductModel({
     required this.id,
     required this.idCategory,
-    required this.categoryName,
-    required this.documentid,
+    this.categoryName,
+    this.documentid,
     required this.name,
     required this.description,
     required this.available,
@@ -32,7 +35,7 @@ class ProductModel {
 
   ProductModel copyWith({
     int? id,
-    String? idCategory,
+    int? idCategory,
     String? categoryName,
     String? documentid,
     String? name,
@@ -62,14 +65,14 @@ class ProductModel {
 
   factory ProductModel.fromMap(Map<String, dynamic> json) {
     return ProductModel(
-      id: json['id'],
-      idCategory: json['id_category'],
+      id: json['id'] ?? 0,
+      idCategory: json['id_category'] ?? 0,
       categoryName: json['category_name'],
       documentid: json['documentId'],
-      name: json['name'],
-      description: json['description'],
-      available: json['available'],
-      stock: json['stock'],
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
+      available: json['available'] ?? false,
+      stock: json['stock'] ?? 0,
       expired: json['expired'],
       createdat: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
@@ -98,5 +101,11 @@ class ProductModel {
       'updatedAt': updatedat?.toIso8601String(),
       'publishedAt': publishedat?.toIso8601String(),
     };
+  }
+
+  // ================= TAMBAHAN INI =================
+  @override
+  String toString() {
+    return 'ProductModel(name: $name, id: $id)';
   }
 }
