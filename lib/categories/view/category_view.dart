@@ -18,6 +18,12 @@ class CategoryView extends StatefulWidget {
 class _CategoryViewState
     extends State<CategoryView> {
 
+  // SEARCH
+  final searchController =
+      TextEditingController();
+
+  String searchText = "";
+
   Future<String?> getToken() async {
 
     final prefs =
@@ -152,8 +158,23 @@ class _CategoryViewState
           // ================= SUCCESS =================
           if (state is CategoryLoaded) {
 
+            final categories =
+                state.categories;
+
+            // FILTER CATEGORY
+            final filteredCategories =
+                categories.where((category) {
+
+              return category.name
+                  .toLowerCase()
+                  .contains(
+                    searchText.toLowerCase(),
+                  );
+
+            }).toList();
+
             // EMPTY
-            if (state.categories.isEmpty) {
+            if (categories.isEmpty) {
 
               return const Center(
                 child: Column(
@@ -182,188 +203,273 @@ class _CategoryViewState
               );
             }
 
-            // ================= LIST =================
-            return ListView.builder(
+            return Column(
 
-              padding:
-                  const EdgeInsets.all(16),
+              children: [
 
-              itemCount:
-                  state.categories.length,
-
-              itemBuilder: (context, index) {
-
-                final item =
-                    state.categories[index];
-
-                final color =
-                    _cardColor(index);
-
-                return Container(
-
-                  margin:
-                      const EdgeInsets.only(
-                    bottom: 14,
-                  ),
-
+                // ================= SEARCH =================
+                Padding(
                   padding:
                       const EdgeInsets.all(16),
 
-                  decoration: BoxDecoration(
+                  child: TextField(
+                    controller:
+                        searchController,
 
-                    color: Colors.white,
+                    onChanged: (value) {
 
-                    borderRadius:
-                        BorderRadius.circular(18),
+                      setState(() {
+                        searchText = value;
+                      });
+                    },
 
-                    boxShadow: [
+                    decoration: InputDecoration(
 
-                      BoxShadow(
-                        color: Colors.black
-                            .withOpacity(0.04),
+                      hintText:
+                          "Cari category...",
 
-                        blurRadius: 10,
-
-                        offset:
-                            const Offset(0, 4),
+                      prefixIcon: const Icon(
+                        Icons.search,
                       ),
-                    ],
+
+                      filled: true,
+                      fillColor: Colors.white,
+
+                      border:
+                          OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(
+                                14),
+                        borderSide:
+                            BorderSide.none,
+                      ),
+
+                      enabledBorder:
+                          OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(
+                                14),
+                        borderSide:
+                            BorderSide.none,
+                      ),
+
+                      focusedBorder:
+                          OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(
+                                14),
+                        borderSide:
+                            const BorderSide(
+                          color:
+                              Color(0xFF6C63FF),
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
                   ),
+                ),
 
-                  child: Row(
+                // ================= LIST =================
+                Expanded(
+                  child: ListView.builder(
 
-                    children: [
+                    padding:
+                        const EdgeInsets.symmetric(
+                      horizontal: 16,
+                    ),
 
-                      // ================= ICON =================
-                      Container(
+                    itemCount:
+                        filteredCategories.length,
 
-                        width: 52,
-                        height: 52,
+                    itemBuilder:
+                        (context, index) {
+
+                      final item =
+                          filteredCategories[index];
+
+                      final color =
+                          _cardColor(index);
+
+                      return Container(
+
+                        margin:
+                            const EdgeInsets.only(
+                          bottom: 14,
+                        ),
+
+                        padding:
+                            const EdgeInsets.all(16),
 
                         decoration: BoxDecoration(
-                          color:
-                              color.withOpacity(
-                            0.12,
-                          ),
+
+                          color: Colors.white,
 
                           borderRadius:
                               BorderRadius.circular(
-                            14,
-                          ),
-                        ),
+                                  18),
 
-                        child: Icon(
-                          Icons.category_rounded,
-                          color: color,
-                          size: 26,
-                        ),
-                      ),
+                          boxShadow: [
 
-                      const SizedBox(width: 14),
+                            BoxShadow(
+                              color: Colors.black
+                                  .withOpacity(0.04),
 
-                      // ================= CONTENT =================
-                      Expanded(
+                              blurRadius: 10,
 
-                        child: Column(
-
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
-
-                          children: [
-
-                            Text(
-                              item.name,
-
-                              style:
-                                  const TextStyle(
-                                fontWeight:
-                                    FontWeight.bold,
-                                fontSize: 16,
-                                color:
-                                    Color(0xFF2D2D2D),
-                              ),
-                            ),
-
-                            const SizedBox(height: 4),
-
-                            Text(
-                              item.description,
-
-                              maxLines: 2,
-
-                              overflow:
-                                  TextOverflow.ellipsis,
-
-                              style:
-                                  const TextStyle(
-                                fontSize: 13,
-                                color: Colors.grey,
-                                height: 1.4,
-                              ),
+                              offset:
+                                  const Offset(0, 4),
                             ),
                           ],
                         ),
-                      ),
 
-                      // ================= ACTION =================
-                      Row(
+                        child: Row(
 
-                        children: [
+                          children: [
 
-                          // EDIT
-                          IconButton(
+                            // ICON
+                            Container(
 
-                            icon: Icon(
-                              Icons.edit_rounded,
-                              color: color,
+                              width: 52,
+                              height: 52,
+
+                              decoration:
+                                  BoxDecoration(
+                                color:
+                                    color.withOpacity(
+                                  0.12,
+                                ),
+
+                                borderRadius:
+                                    BorderRadius.circular(
+                                  14,
+                                ),
+                              ),
+
+                              child: Icon(
+                                Icons
+                                    .category_rounded,
+                                color: color,
+                                size: 26,
+                              ),
                             ),
 
-                            onPressed: () {
+                            const SizedBox(
+                                width: 14),
 
-                              Navigator.push(
-                                context,
+                            // CONTENT
+                            Expanded(
 
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      EditCategoryPage(
-                                    category: item,
+                              child: Column(
+
+                                crossAxisAlignment:
+                                    CrossAxisAlignment
+                                        .start,
+
+                                children: [
+
+                                  Text(
+                                    item.name,
+
+                                    style:
+                                        const TextStyle(
+                                      fontWeight:
+                                          FontWeight
+                                              .bold,
+                                      fontSize: 16,
+                                      color: Color(
+                                          0xFF2D2D2D),
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
 
-                          // DELETE
-                          IconButton(
+                                  const SizedBox(
+                                      height: 4),
 
-                            icon: const Icon(
-                              Icons
-                                  .delete_outline_rounded,
+                                  Text(
+                                    item.description,
 
-                              color:
-                                  Colors.redAccent,
+                                    maxLines: 2,
+
+                                    overflow:
+                                        TextOverflow
+                                            .ellipsis,
+
+                                    style:
+                                        const TextStyle(
+                                      fontSize: 13,
+                                      color:
+                                          Colors.grey,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
 
-                            onPressed: () {
+                            // ACTION
+                            Row(
 
-                              Navigator.push(
-                                context,
+                              children: [
 
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      DeleteCategoryPage(
-                                    category: item,
+                                // EDIT
+                                IconButton(
+
+                                  icon: Icon(
+                                    Icons
+                                        .edit_rounded,
+                                    color: color,
                                   ),
+
+                                  onPressed: () {
+
+                                    Navigator.push(
+                                      context,
+
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            EditCategoryPage(
+                                          category:
+                                              item,
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
+
+                                // DELETE
+                                IconButton(
+
+                                  icon: const Icon(
+                                    Icons
+                                        .delete_outline_rounded,
+
+                                    color:
+                                        Colors.redAccent,
+                                  ),
+
+                                  onPressed: () {
+
+                                    Navigator.push(
+                                      context,
+
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            DeleteCategoryPage(
+                                          category:
+                                              item,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
+                ),
+              ],
             );
           }
 
