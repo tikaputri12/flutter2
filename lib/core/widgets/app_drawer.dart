@@ -15,88 +15,81 @@ class AppDrawer extends StatelessWidget {
     required IconData smallIcon,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 14,
-        vertical: 6,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       child: InkWell(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(22),
         onTap: () {
           Navigator.pop(context);
           Navigator.pushNamed(context, route);
         },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
+        child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
+            color: const Color(0xFFF7F5FF),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(
+              color: const Color(0xFFB9A7D9).withOpacity(0.2),
+            ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 14,
-                offset: const Offset(0, 6),
+                color: const Color(0xFF7C5CFF).withOpacity(0.08),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
           child: Row(
             children: [
-              // ================= ICON =================
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    height: 62,
-                    width: 62,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: gradientColors,
-                      ),
-                      borderRadius: BorderRadius.circular(22),
-                      boxShadow: [
-                        BoxShadow(
-                          color: gradientColors.first.withOpacity(0.35),
-                          blurRadius: 12,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
+              // ICON (lebih premium & soft glow)
+              Container(
+                height: 54,
+                width: 54,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      gradientColors.first.withOpacity(0.9),
+                      gradientColors.last.withOpacity(0.9),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [
+                    BoxShadow(
+                      color: gradientColors.first.withOpacity(0.25),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
                     ),
-                  ),
+                  ],
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Icon(icon, color: Colors.white, size: 26),
 
-                  Icon(
-                    icon,
-                    color: Colors.white,
-                    size: 30,
-                  ),
-
-                  Positioned(
-                    right: 6,
-                    bottom: 6,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        border: Border.all(
+                    Positioned(
+                      right: 6,
+                      bottom: 6,
+                      child: Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: const BoxDecoration(
                           color: Colors.white,
-                          width: 1.5,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          smallIcon,
+                          size: 10,
+                          color: Color(0xFF7C5CFF),
                         ),
                       ),
-                      child: Icon(
-                        smallIcon,
-                        size: 12,
-                        color: gradientColors.first,
-                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
 
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
 
-              // ================= TEXT =================
+              // TEXT (lebih clean & luxury feel)
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,19 +98,18 @@ class AppDrawer extends StatelessWidget {
                       title,
                       style: const TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black87,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF2B1B4A),
+                        letterSpacing: 0.2,
                       ),
                     ),
-
-                    const SizedBox(height: 5),
-
+                    const SizedBox(height: 4),
                     Text(
                       subtitle,
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.grey.shade600,
-                        height: 1.3,
+                        height: 1.2,
                       ),
                     ),
                   ],
@@ -125,16 +117,16 @@ class AppDrawer extends StatelessWidget {
               ),
 
               Container(
-                height: 34,
-                width: 34,
+                height: 30,
+                width: 30,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(12),
+                  color: const Color(0xFFF0EBFF),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.arrow_forward_ios_rounded,
-                  size: 16,
-                  color: Colors.grey.shade500,
+                  size: 14,
+                  color: Color(0xFF7C5CFF),
                 ),
               ),
             ],
@@ -147,73 +139,66 @@ class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color(0xffF4F7FC),
+      backgroundColor: const Color(0xFFF4F1FF),
 
       child: Column(
         children: [
-          // ================= HEADER =================
+          // HEADER (lebih smooth & elegant)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.only(
-              top: 60,
+              top: 70,
               left: 24,
               right: 24,
-              bottom: 28,
+              bottom: 26,
             ),
-
             decoration: const BoxDecoration(
               gradient: LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 59, 48, 106),
+                  Color.fromARGB(255, 84, 57, 165),
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Color(0xff667eea),
-                  Color(0xff764ba2),
-                ],
               ),
-
               borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(34),
-                bottomRight: Radius.circular(34),
+                bottomLeft: Radius.circular(32),
+                bottomRight: Radius.circular(32),
               ),
             ),
-
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // AVATAR
                 Container(
-                  padding: const EdgeInsets.all(5),
-
+                  padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.18),
+                    color: Colors.white.withOpacity(0.25),
                     shape: BoxShape.circle,
                   ),
-
                   child: const CircleAvatar(
-                    radius: 35,
+                    radius: 30,
                     backgroundColor: Colors.white,
-
                     child: Icon(
                       Icons.flutter_dash_rounded,
-                      size: 42,
-                      color: Color(0xff667eea),
+                      size: 38,
+                      color: Color(0xFF6D4CFF),
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 18),
+                const SizedBox(height: 14),
 
                 const Text(
-                  "Bloc Cubit App",
+                  " suga app ",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
+                    letterSpacing: 0.3,
                   ),
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
 
                 BlocBuilder<LoginBloc, LoginState>(
                   builder: (context, state) {
@@ -222,32 +207,26 @@ class AppDrawer extends StatelessWidget {
 
                       return Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
+                          horizontal: 12,
                           vertical: 10,
                         ),
-
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(16),
+                          color: Colors.white.withOpacity(0.18),
+                          borderRadius: BorderRadius.circular(14),
                         ),
-
                         child: Row(
                           children: [
                             const Icon(
-                              Icons.person_rounded,
+                              Icons.person,
                               color: Colors.white,
-                              size: 20,
+                              size: 18,
                             ),
-
-                            const SizedBox(width: 10),
-
+                            const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 data!.username,
-
                                 style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 14,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -259,33 +238,16 @@ class AppDrawer extends StatelessWidget {
 
                     return Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
+                        horizontal: 12,
                         vertical: 10,
                       ),
-
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(16),
+                        color: Colors.white.withOpacity(0.18),
+                        borderRadius: BorderRadius.circular(14),
                       ),
-
-                      child: const Row(
-                        children: [
-                          Icon(
-                            Icons.person_outline,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-
-                          SizedBox(width: 10),
-
-                          Text(
-                            "Unauthorized",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
+                      child: const Text(
+                        "Unauthorized",
+                        style: TextStyle(color: Colors.white),
                       ),
                     );
                   },
@@ -294,37 +256,36 @@ class AppDrawer extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 18),
+          const SizedBox(height: 10),
 
-          // ================= MENU =================
+          // MENU
           Expanded(
             child: ListView(
               physics: const BouncingScrollPhysics(),
-
               children: [
                 buildMenuItem(
                   context: context,
                   icon: Icons.home_rounded,
-                  smallIcon: Icons.star,
+                  smallIcon: Icons.auto_awesome,
                   title: "Home",
                   subtitle: "Halaman utama aplikasi",
                   route: '/home',
                   gradientColors: [
-                    const Color(0xff4facfe),
-                    const Color(0xff00c6fb),
+                    const Color(0xFF6D4CFF),
+                    const Color(0xFF9F8BFF),
                   ],
                 ),
 
                 buildMenuItem(
                   context: context,
                   icon: Icons.calculate_rounded,
-                  smallIcon: Icons.flash_on,
+                  smallIcon: Icons.bolt,
                   title: "Counter",
                   subtitle: "Counter Cubit",
                   route: '/counter',
                   gradientColors: [
-                    const Color(0xffffb347),
-                    const Color(0xffffcc33),
+                    const Color.fromARGB(255, 232, 160, 45),
+                    const Color(0xFFFFD54F),
                   ],
                 ),
 
@@ -333,24 +294,24 @@ class AppDrawer extends StatelessWidget {
                   icon: Icons.article_rounded,
                   smallIcon: Icons.edit_note,
                   title: "Post List",
-                  subtitle: "Menampilkan daftar posts",
+                  subtitle: "Daftar posts",
                   route: '/posts',
                   gradientColors: [
-                    const Color(0xff43e97b),
-                    const Color(0xff38f9d7),
+                    const Color(0xFF4DD0E1),
+                    const Color(0xFF26C6DA),
                   ],
                 ),
 
                 buildMenuItem(
                   context: context,
                   icon: Icons.category_rounded,
-                  smallIcon: Icons.layers,
+                  smallIcon: Icons.grid_view_rounded,
                   title: "Category",
                   subtitle: "CRUD category",
                   route: '/categories',
                   gradientColors: [
-                    const Color(0xffa18cd1),
-                    const Color(0xfffbc2eb),
+                    const Color(0xFFBA68C8),
+                    const Color(0xFFE1BEE7),
                   ],
                 ),
 
@@ -359,11 +320,11 @@ class AppDrawer extends StatelessWidget {
                   icon: Icons.shopping_bag_rounded,
                   smallIcon: Icons.shopping_cart,
                   title: "Products",
-                  subtitle: "Menampilkan daftar products",
+                  subtitle: "Daftar produk",
                   route: '/products',
                   gradientColors: [
-                    const Color(0xffff9966),
-                    const Color(0xffff5e62),
+                    const Color(0xFFFF8A65),
+                    const Color(0xFFFFAB91),
                   ],
                 ),
 
@@ -372,59 +333,37 @@ class AppDrawer extends StatelessWidget {
                   icon: Icons.person_rounded,
                   smallIcon: Icons.verified,
                   title: "Profile",
-                  subtitle: "Melihat profile user",
+                  subtitle: "User profile",
                   route: '/profile',
                   gradientColors: [
-                    const Color(0xff11998e),
-                    const Color(0xff38ef7d),
+                    const Color(0xFF26A69A),
+                    const Color(0xFF80CBC4),
                   ],
                 ),
 
                 const SizedBox(height: 18),
 
-                // ================= LOGOUT =================
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                  ),
-
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: ElevatedButton.icon(
                     onPressed: () {
                       Navigator.pop(context);
-
-                      Navigator.pushNamed(
-                        context,
-                        '/login',
-                      );
+                      Navigator.pushNamed(context, '/login');
                     },
-
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xffef4444),
+                      backgroundColor: const Color(0xFFEF5350),
                       foregroundColor: Colors.white,
-                      elevation: 0,
-
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 16,
-                      ),
-
+                      padding: const EdgeInsets.symmetric(vertical: 15),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                     ),
-
-                    icon: const Icon(Icons.logout_rounded),
-
-                    label: const Text(
-                      "Logout",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    icon: const Icon(Icons.logout),
+                    label: const Text("Logout"),
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
               ],
             ),
           ),
