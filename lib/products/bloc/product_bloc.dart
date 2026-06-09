@@ -6,114 +6,162 @@ import 'package:flutter2/products/repository/product_repository.dart';
 part 'product_event.dart';
 part 'product_state.dart';
 
-class ProductBloc extends Bloc<ProductEvent, ProductState> {
-
+class ProductBloc
+    extends Bloc<ProductEvent, ProductState> {
   final ProductRepository repository;
 
   ProductBloc(this.repository)
       : super(ProductInitial()) {
 
     // ================= GET PRODUCT =================
-    on<GetProductEvent>((event, emit) async {
+    on<GetProductEvent>(
+      (event, emit) async {
 
-      emit(ProductLoading());
+        emit(ProductLoading());
 
-      try {
+        try {
 
-        final products =
-            await repository.getProducts(
-          token: event.token,
-        );
+          final products =
+              await repository.getProducts(
+            token: event.token,
+          );
 
-        emit(ProductLoaded(products));
+          emit(
+            ProductLoaded(products),
+          );
 
-      } catch (e) {
+        } catch (e) {
 
-        emit(ProductError(e.toString()));
-      }
-    });
+          emit(
+            ProductError(
+              e.toString(),
+            ),
+          );
+        }
+      },
+    );
 
     // ================= CREATE PRODUCT =================
-    on<CreateProductEvent>((event, emit) async {
+    on<CreateProductEvent>(
+      (event, emit) async {
 
-      try {
+        emit(ProductLoading());
 
-        await repository.createProduct(
-          token: event.token,
-          idCategory: event.idCategory,
-          name: event.name,
-          description: event.description,
-          available: event.available,
-          stock: event.stock,
-          expired: event.expired,
-        );
+        try {
 
-        // reload product
-        final products =
-            await repository.getProducts(
-          token: event.token,
-        );
+          await repository.createProduct(
+            token: event.token,
+            idCategory:
+                event.idCategory,
+            name: event.name,
+            description:
+                event.description,
+            available:
+                event.available,
+            stock: event.stock,
+            expired:
+                event.expired,
+          );
 
-        emit(ProductLoaded(products));
+          // RELOAD PRODUCT
+          final products =
+              await repository.getProducts(
+            token: event.token,
+          );
 
-      } catch (e) {
+          emit(
+            ProductLoaded(products),
+          );
 
-        emit(ProductError(e.toString()));
-      }
-    });
+        } catch (e) {
+
+          emit(
+            ProductError(
+              e.toString(),
+            ),
+          );
+        }
+      },
+    );
 
     // ================= UPDATE PRODUCT =================
-    on<UpdateProductEvent>((event, emit) async {
+    on<UpdateProductEvent>(
+      (event, emit) async {
 
-      try {
+        emit(ProductLoading());
 
-        await repository.updateProduct(
-          token: event.token,
-          id: event.id,
-          name: event.name,
-          description: event.description,
-          idCategory: event.idCategory,
-          stock: event.stock,
-          available: event.available,
-          expired: event.expired,
-        );
+        try {
 
-        // reload product
-        final products =
-            await repository.getProducts(
-          token: event.token,
-        );
+          print("UPDATE PRODUCT");
 
-        emit(ProductLoaded(products));
+          await repository.updateProduct(
+            token: event.token,
+            id: event.id,
+            name: event.name,
+            description:
+                event.description,
+            idCategory:
+                event.idCategory,
+            stock: event.stock,
+            available:
+                event.available,
+            expired:
+                event.expired,
+          );
 
-      } catch (e) {
+          // RELOAD PRODUCT
+          final products =
+              await repository.getProducts(
+            token: event.token,
+          );
 
-        emit(ProductError(e.toString()));
-      }
-    });
+          emit(
+            ProductLoaded(products),
+          );
+
+        } catch (e) {
+
+          emit(
+            ProductError(
+              e.toString(),
+            ),
+          );
+        }
+      },
+    );
 
     // ================= DELETE PRODUCT =================
-    on<DeleteProductEvent>((event, emit) async {
+    on<DeleteProductEvent>(
+      (event, emit) async {
 
-      try {
+        emit(ProductLoading());
 
-        await repository.deleteProduct(
-          token: event.token,
-          id: event.id,
-        );
+        try {
 
-        // reload product
-        final products =
-            await repository.getProducts(
-          token: event.token,
-        );
+          await repository.deleteProduct(
+            token: event.token,
+            id: event.id,
+          );
 
-        emit(ProductLoaded(products));
+          // RELOAD PRODUCT
+          final products =
+              await repository.getProducts(
+            token: event.token,
+          );
 
-      } catch (e) {
+          emit(
+            ProductLoaded(products),
+          );
 
-        emit(ProductError(e.toString()));
-      }
-    });
+        } catch (e) {
+
+          emit(
+            ProductError(
+              e.toString(),
+            ),
+          );
+        }
+      },
+    );
   }
 }
