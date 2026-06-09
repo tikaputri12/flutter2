@@ -15,8 +15,10 @@ class ProductView extends StatefulWidget {
 }
 
 class _ProductViewState extends State<ProductView> {
-
   String selectedCategory = "Semua";
+  String searchQuery = "";
+
+  final TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
@@ -24,26 +26,24 @@ class _ProductViewState extends State<ProductView> {
     loadProducts();
   }
 
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> loadProducts() async {
-
-    final prefs =
-        await SharedPreferences.getInstance();
-
-    final token =
-        prefs.getString('token');
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
 
     if (token != null && context.mounted) {
-
       context.read<ProductBloc>().add(
-            GetProductEvent(
-              token: token,
-            ),
+            GetProductEvent(token: token),
           );
     }
   }
 
   Color _cardColor(int index) {
-
     final colors = [
       const Color(0xFF6C63FF),
       const Color(0xFF43C6AC),
@@ -51,22 +51,18 @@ class _ProductViewState extends State<ProductView> {
       const Color(0xFF56CCF2),
       const Color(0xFFBB6BD9),
     ];
-
     return colors[index % colors.length];
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
       backgroundColor: const Color(0xFFF5F7FA),
 
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-
         title: const Text(
           "Products",
           style: TextStyle(
@@ -76,128 +72,122 @@ class _ProductViewState extends State<ProductView> {
         ),
       ),
 
-      // ================= FLOATING BUTTON =================
       floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-
+        backgroundColor: Colors.deepPurple,
+        child: const Icon(Icons.add, color: Colors.white),
         onPressed: () async {
-
-          final prefs =
-              await SharedPreferences.getInstance();
-
-          final token =
-              prefs.getString('token') ?? '';
+          final prefs = await SharedPreferences.getInstance();
+          final token = prefs.getString('token') ?? '';
 
           if (context.mounted) {
-
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => CreateProductPage(
-                  token: token,
-                ),
+                builder: (_) => CreateProductPage(token: token),
               ),
             );
           }
         },
       ),
 
-      // ================= BODY =================
       body: BlocBuilder<ProductBloc, ProductState>(
-
         builder: (context, state) {
-
-          // ================= LOADING =================
           if (state is ProductLoading) {
-
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
 
-          // ================= ERROR =================
           if (state is ProductError) {
-
-            return Center(
-              child: Text(state.message),
-            );
+            return Center(child: Text(state.message));
           }
 
-          // ================= SUCCESS =================
           if (state is ProductLoaded) {
+            final allProducts = state.products;
 
-            if (state.products.isEmpty) {
-
-              return const Center(
-                child: Text("Data product kosong"),
-              );
+            if (allProducts.isEmpty) {
+              return const Center(child: Text("Data product kosong"));
             }
 
             // ================= CATEGORY =================
-            final categories = <String>{
+            final categories = <String>[
               "Semua",
+              ...allProducts
+                  .map((e) => e.categoryName ?? "Tanpa Category")
+                  .toSet()
+                  .toList(),
+            ];
 
-              ...state.products
-                  .map((e) => e.categoryName)
-                  .whereType<String>()
-                  .where(
-                    (e) => e.trim().isNotEmpty,
-                  ),
-            }.toList();
+            if (!categories.contains(selectedCategory)) {
+              selectedCategory = "Semua";
+            }
 
-            // ================= FILTER =================
-            final filteredProducts =
-                selectedCategory == "Semua"
+            // ================= FILTER CATEGORY =================
+            List filteredProducts = selectedCategory == "Semua"
+                ? allProducts
+                : allProducts
+                    .where((p) => p.categoryName == selectedCategory)
+                    .toList();
 
-                    ? state.products
+            // ================= SEARCH FILTER =================
+            if (searchQuery.isNotEmpty) {
+              filteredProducts = filteredProducts.where((product) {
+                final name = product.name.toLowerCase();
+                final desc = product.description.toLowerCase();
+                final cat = (product.categoryName ?? "").toLowerCase();
+                final query = searchQuery.toLowerCase();
 
-                    : state.products.where(
-                        (product) {
-
-                          return product.categoryName ==
-                              selectedCategory;
-                        },
-                      ).toList();
+                return name.contains(query) ||
+                    desc.contains(query) ||
+                    cat.contains(query);
+              }).toList();
+            }
 
             return Column(
-
               children: [
-
-                // ================= DROPDOWN =================
+                // ================= SEARCH =================
                 Padding(
-                  padding: const EdgeInsets.all(16),
-
-                  child: DropdownButtonFormField<String>(
-
-                    value: selectedCategory,
-                    isExpanded: true,
-
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                  child: TextField(
+                    controller: searchController,
+                    onChanged: (value) {
+                      setState(() {
+                        searchQuery = value;
+                      });
+                    },
                     decoration: InputDecoration(
+                      hintText: "Cari product...",
+                      prefixIcon: const Icon(Icons.search),
                       filled: true,
                       fillColor: Colors.white,
-
-                      labelText: "Pilih Category",
-
                       border: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(14),
-
+                        borderRadius: BorderRadius.circular(14),
                         borderSide: BorderSide.none,
                       ),
                     ),
+                  ),
+                ),
 
-                    items: categories.map(
-                      (category) {
-
-                        return DropdownMenuItem(
-                          value: category,
-                          child: Text(category),
-                        );
-                      },
-                    ).toList(),
-
+                // ================= CATEGORY =================
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: DropdownButtonFormField<String>(
+                    value: selectedCategory,
+                    isExpanded: true,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      prefixIcon: const Icon(Icons.category),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    items: categories.map((category) {
+                      return DropdownMenuItem(
+                        value: category,
+                        child: Text(category),
+                      );
+                    }).toList(),
                     onChanged: (value) {
-
                       setState(() {
                         selectedCategory = value!;
                       });
@@ -205,358 +195,208 @@ class _ProductViewState extends State<ProductView> {
                   ),
                 ),
 
-                // ================= LIST PRODUCT =================
+                const SizedBox(height: 10),
+
+                // ================= LIST =================
                 Expanded(
+                  child: filteredProducts.isEmpty
+                      ? const Center(
+                          child: Text("Product tidak ditemukan"),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: filteredProducts.length,
+                          itemBuilder: (context, index) {
+                            final product = filteredProducts[index];
+                            final color = _cardColor(index);
 
-                  child: ListView.builder(
-
-                    padding:
-                        const EdgeInsets.symmetric(
-                      horizontal: 16,
-                    ),
-
-                    itemCount:
-                        filteredProducts.length,
-
-                    itemBuilder: (context, index) {
-
-                      final product =
-                          filteredProducts[index];
-
-                      final color =
-                          _cardColor(index);
-
-                      return Container(
-
-                        margin:
-                            const EdgeInsets.only(
-                          bottom: 16,
-                        ),
-
-                        padding:
-                            const EdgeInsets.all(16),
-
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-
-                          borderRadius:
-                              BorderRadius.circular(18),
-
-                          boxShadow: [
-                            BoxShadow(
-                              color:
-                                  Colors.black.withOpacity(
-                                0.05,
-                              ),
-
-                              blurRadius: 10,
-
-                              offset:
-                                  const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-
-                        child: Row(
-
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
-
-                          children: [
-
-                            // ================= ICON =================
-                            Container(
-                              width: 55,
-                              height: 55,
-
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 16),
+                              padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color:
-                                    color.withOpacity(0.12),
-
-                                borderRadius:
-                                    BorderRadius.circular(
-                                  14,
-                                ),
-                              ),
-
-                              child: Icon(
-                                Icons.shopping_bag_rounded,
-                                color: color,
-                                size: 28,
-                              ),
-                            ),
-
-                            const SizedBox(width: 16),
-
-                            // ================= CONTENT =================
-                            Expanded(
-
-                              child: Column(
-
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-
-                                children: [
-
-                                  // CATEGORY
-                                  Container(
-
-                                    padding:
-                                        const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 5,
-                                    ),
-
-                                    decoration: BoxDecoration(
-                                      color:
-                                          color.withOpacity(
-                                        0.12,
-                                      ),
-
-                                      borderRadius:
-                                          BorderRadius.circular(
-                                        20,
-                                      ),
-                                    ),
-
-                                    child: Text(
-
-                                      product.categoryName ??
-                                          "Tanpa Kategori",
-
-                                      style: TextStyle(
-                                        color: color,
-                                        fontWeight:
-                                            FontWeight.bold,
-                                        fontSize: 12,
-                                      ),
-                                    ),
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(18),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.05),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
                                   ),
-
-                                  const SizedBox(height: 8),
-
-                                  // NAME
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
                                   Text(
                                     product.name,
-
-                                    style:
-                                        const TextStyle(
-                                      fontWeight:
-                                          FontWeight.bold,
-                                      fontSize: 16,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
 
                                   const SizedBox(height: 6),
 
-                                  // DESCRIPTION
                                   Text(
                                     product.description,
-
                                     maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
 
-                                    overflow:
-                                        TextOverflow.ellipsis,
+                                  const SizedBox(height: 8),
 
-                                    style:
-                                        const TextStyle(
-                                      color: Colors.grey,
-                                    ),
+                                  Text(
+                                    "Category: ${product.categoryName ?? '-'}",
                                   ),
 
                                   const SizedBox(height: 10),
 
-                                  // AVAILABLE + STOCK
                                   Row(
                                     children: [
-
                                       Container(
-
-                                        padding:
-                                            const EdgeInsets.symmetric(
+                                        padding: const EdgeInsets.symmetric(
                                           horizontal: 10,
                                           vertical: 5,
                                         ),
-
-                                        decoration:
-                                            BoxDecoration(
-
-                                          color:
-                                              product.available
-
-                                                  ? Colors.green
-                                                      .withOpacity(
-                                                    0.12,
-                                                  )
-
-                                                  : Colors.red
-                                                      .withOpacity(
-                                                    0.12,
-                                                  ),
-
+                                        decoration: BoxDecoration(
+                                          color: product.available
+                                              ? Colors.green.withOpacity(0.15)
+                                              : Colors.red.withOpacity(0.15),
                                           borderRadius:
-                                              BorderRadius.circular(
-                                            20,
-                                          ),
+                                              BorderRadius.circular(20),
                                         ),
-
                                         child: Text(
-
                                           product.available
                                               ? "Available"
                                               : "Not Available",
-
-                                          style: TextStyle(
-
-                                            color:
-                                                product.available
-                                                    ? Colors.green
-                                                    : Colors.red,
-
-                                            fontWeight:
-                                                FontWeight.w600,
-
-                                            fontSize: 12,
-                                          ),
                                         ),
                                       ),
-
                                       const Spacer(),
-
-                                      Text(
-                                        "Stock : ${product.stock}",
-
-                                        style:
-                                            const TextStyle(
-                                          fontWeight:
-                                              FontWeight.w600,
-                                        ),
-                                      ),
+                                      Text("Stock: ${product.stock}"),
                                     ],
                                   ),
 
-                                  const SizedBox(height: 14),
+                                  const SizedBox(height: 12),
 
-                                  // ================= BUTTON =================
+                                  // ================= EDIT & DELETE (NEW UI PREMIUM) =================
                                   Row(
                                     children: [
-
-                                      // EDIT
                                       Expanded(
-                                        child:
-                                            OutlinedButton.icon(
-
-                                          icon: const Icon(
-                                            Icons.edit,
-                                          ),
-
-                                          label:
-                                              const Text(
-                                            "Edit",
-                                          ),
-
-                                          onPressed:
-                                              () async {
-
-                                            final prefs =
-                                                await SharedPreferences
-                                                    .getInstance();
-
-                                            final token =
-                                                prefs.getString(
-                                                      'token',
-                                                    ) ??
-                                                    '';
-
-                                            if (context
-                                                .mounted) {
-
-                                              Navigator.push(
-                                                context,
-
-                                                MaterialPageRoute(
-                                                  builder:
-                                                      (_) =>
-                                                          EditProductPage(
-                                                    token:
-                                                        token,
-                                                    product:
-                                                        product,
+                                        child: InkWell(
+                                          borderRadius: BorderRadius.circular(14),
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) =>
+                                                    EditProductPage(
+                                                  product: product,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 12,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              gradient: const LinearGradient(
+                                                colors: [
+                                                  Color(0xFF7F7FD5),
+                                                  Color(0xFF86A8E7),
+                                                ],
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
+                                            ),
+                                            child: const Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(Icons.edit,
+                                                    color: Colors.white,
+                                                    size: 18),
+                                                SizedBox(width: 6),
+                                                Text(
+                                                  "Edit",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight:
+                                                        FontWeight.bold,
                                                   ),
                                                 ),
-                                              );
-                                            }
-                                          },
+                                              ],
+                                            ),
+                                          ),
                                         ),
                                       ),
 
-                                      const SizedBox(width: 10),
+                                      const SizedBox(width: 12),
 
-                                      // DELETE
                                       Expanded(
-                                        child:
-                                            ElevatedButton.icon(
-
-                                          style:
-                                              ElevatedButton
-                                                  .styleFrom(
-                                            backgroundColor:
-                                                Colors.red,
-                                          ),
-
-                                          icon: const Icon(
-                                            Icons.delete,
-                                          ),
-
-                                          label:
-                                              const Text(
-                                            "Delete",
-                                          ),
-
-                                          onPressed:
-                                              () async {
-
+                                        child: InkWell(
+                                          borderRadius: BorderRadius.circular(14),
+                                          onTap: () async {
                                             final prefs =
                                                 await SharedPreferences
                                                     .getInstance();
 
                                             final token =
-                                                prefs.getString(
-                                                      'token',
-                                                    ) ??
-                                                    '';
+                                                prefs.getString('token') ?? '';
 
-                                            if (context
-                                                .mounted) {
-
-                                              Navigator.push(
-                                                context,
-
-                                                MaterialPageRoute(
-                                                  builder:
-                                                      (_) =>
-                                                          DeleteProductPage(
-                                                    token:
-                                                        token,
-                                                    product:
-                                                        product,
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) =>
+                                                    DeleteProductPage(
+                                                  token: token,
+                                                  product: product,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 12,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              gradient: const LinearGradient(
+                                                colors: [
+                                                  Color(0xFFFF416C),
+                                                  Color(0xFFFF4B2B),
+                                                ],
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
+                                            ),
+                                            child: const Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(Icons.delete,
+                                                    color: Colors.white,
+                                                    size: 18),
+                                                SizedBox(width: 6),
+                                                Text(
+                                                  "Delete",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight:
+                                                        FontWeight.bold,
                                                   ),
                                                 ),
-                                              );
-                                            }
-                                          },
+                                              ],
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ],
                                   )
                                 ],
                               ),
-                            ),
-                          ],
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
                 ),
               ],
             );
